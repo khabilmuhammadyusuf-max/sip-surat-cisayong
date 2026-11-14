@@ -1,15 +1,35 @@
 <?php
 // File: config/database.php
 
-$host    = getenv('DB_HOST') ?: 'localhost';
-$port    = getenv('DB_PORT') ?: '3306';
-$db      = getenv('DB_NAME') ?: 'sip_surat';
-$user    = getenv('DB_USER') ?: 'root';
-$pass    = getenv('DB_PASS') !== false ? getenv('DB_PASS') : '';
+$host    = getenv('MYSQLHOST') ?: getenv('MYSQL_HOST') ?: getenv('DB_HOST') ?: 'localhost';
+$port    = getenv('MYSQLPORT') ?: getenv('MYSQL_PORT') ?: getenv('DB_PORT') ?: '3306';
+$db      = getenv('MYSQLDATABASE') ?: getenv('MYSQL_DATABASE') ?: getenv('DB_NAME') ?: 'sip_surat';
+$user    = getenv('MYSQLUSER') ?: getenv('MYSQL_USER') ?: getenv('DB_USER') ?: 'root';
+$pass    = getenv('MYSQLPASSWORD') !== false ? getenv('MYSQLPASSWORD') : (getenv('MYSQL_PASSWORD') !== false ? getenv('MYSQL_PASSWORD') : (getenv('DB_PASS') !== false ? getenv('DB_PASS') : ''));
 $charset = 'utf8mb4';
 
+// Cek apakah menggunakan koneksi URL format (MYSQL_URL / DATABASE_URL dari Railway)
+$connUrl = getenv('MYSQL_URL') ?: getenv('DATABASE_URL');
+if ($connUrl) {
+    $parts = parse_url($connUrl);
+    if ($parts) {
+        $host = $parts['host'] ?? $host;
+        $port = $parts['port'] ?? $port;
+        $user = $parts['user'] ?? $user;
+        $pass = $parts['pass'] ?? $pass;
+        $db   = ltrim($parts['path'] ?? '', '/') ?: $db;
+    }
+}
+
+// Deteksi cerdas BASE_URL (Di localhost tetap /surkec/, di hosting cloud Railway otomatis /)
 if (!defined('BASE_URL')) {
-    define('BASE_URL', getenv('BASE_URL') ?: '/surkec/');
+    if (getenv('BASE_URL')) {
+        define('BASE_URL', getenv('BASE_URL'));
+    } elseif (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') === false && strpos($_SERVER['HTTP_HOST'], '127.0.0.1') === false) {
+        define('BASE_URL', '/');
+    } else {
+        define('BASE_URL', '/surkec/');
+    }
 }
 
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
