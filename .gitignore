@@ -1,0 +1,15 @@
+# Dependencies & Temporary files
+node_modules/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Private IDE & Editor configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Cookie & session dump files
+cookie*.txt
