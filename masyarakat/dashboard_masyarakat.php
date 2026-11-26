@@ -318,10 +318,10 @@ foreach ($pengajuan_list as $p) {
 
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
             <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
-                <span class="material-icons-outlined text-2xl">qr_code_2</span>
+                <span class="material-icons-outlined text-2xl">task_alt</span>
             </div>
             <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai (TTE & PDF Siap Unduh)</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Selesai (Surat Siap Unduh)</p>
                 <p class="text-2xl font-black text-slate-800"><?php echo $stats['disetujui']; ?></p>
             </div>
         </div>
@@ -344,7 +344,7 @@ foreach ($pengajuan_list as $p) {
                 <span class="material-icons-outlined text-blue-900 text-2xl">history</span>
                 <div>
                     <h3 class="font-bold text-lg text-slate-800">Pelacakan Alur Berjenjang Surat Anda</h3>
-                    <p class="text-xs text-slate-400">Alur Resmi: Front Office (PTSP) → Kasi Terkait (Paraf Substansi) → Sekcam (Paraf Koordinasi) → Camat (Approve & TTE QR Code)</p>
+                    <p class="text-xs text-slate-400">Alur Resmi: Front Office (Layanan / PTSP) → Kasi Terkait (Pemeriksaan & Persetujuan) → Selesai</p>
                 </div>
             </div>
         </div>
@@ -386,15 +386,11 @@ foreach ($pengajuan_list as $p) {
                                     <!-- Mini Stepper -->
                                     <?php if ($sInfo['step'] > 0): ?>
                                         <div class="flex items-center space-x-1 mt-2 text-[10px] font-bold">
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 1 ? 'bg-blue-900 text-white' : 'bg-slate-100 text-slate-400'; ?>">1.PTSP</span>
+                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 1 ? 'bg-blue-900 text-white' : 'bg-slate-100 text-slate-400'; ?>">1. Layanan PTSP</span>
                                             <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 2 ? 'bg-blue-900 text-white' : 'bg-slate-100 text-slate-400'; ?>">2.Kasi</span>
+                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 2 ? 'bg-blue-900 text-white' : 'bg-slate-100 text-slate-400'; ?>">2. Kasi Terkait</span>
                                             <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 3 ? 'bg-blue-900 text-white' : 'bg-slate-100 text-slate-400'; ?>">3.Sekcam</span>
-                                            <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 4 ? 'bg-blue-900 text-white' : 'bg-slate-100 text-slate-400'; ?>">4.Camat</span>
-                                            <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 5 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'; ?>">5.PDF</span>
+                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 3 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'; ?>">3. Selesai</span>
                                         </div>
                                     <?php endif; ?>
                                 </td>
@@ -402,7 +398,7 @@ foreach ($pengajuan_list as $p) {
                                     <?php if ($row['status'] === 'ditolak'): ?>
                                         <span class="text-rose-700 font-bold"><?php echo htmlspecialchars($row['catatan_tolak'] ?: 'Berkas ditolak, silakan upload ulang.'); ?></span>
                                     <?php elseif ($row['status'] === 'disetujui'): ?>
-                                        <span class="text-emerald-700 font-bold">No: <?php echo htmlspecialchars($row['nomor_surat_generated']); ?> (TTE QR Code Aktif)</span>
+                                        <span class="text-emerald-700 font-bold">No: <?php echo htmlspecialchars($row['nomor_surat_generated']); ?> (Disetujui)</span>
                                     <?php else: ?>
                                         <span><?php echo htmlspecialchars($sInfo['desc']); ?></span>
                                     <?php endif; ?>

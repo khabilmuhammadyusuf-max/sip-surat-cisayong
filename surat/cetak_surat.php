@@ -475,9 +475,10 @@ function unduhPdfLangsung() {
                     <td style="vertical-align: middle; text-align: center; padding-right: 25px;">
                         <div style="font-size: 13pt; font-weight: bold; letter-spacing: 0.5px; line-height: 1.2; font-family: 'Times New Roman', Times, serif;">PEMERINTAH KABUPATEN TASIKMALAYA</div>
                         <div style="font-size: 16.5pt; font-weight: bold; letter-spacing: 1px; line-height: 1.2; margin: 2px 0; font-family: 'Times New Roman', Times, serif;">KECAMATAN CISAYONG</div>
-                        <div style="font-size: 9pt; font-style: italic; line-height: 1.25; font-family: 'Times New Roman', Times, serif;">
-                            Jalan Raya Cisayong No. 1 Kode Pos 46153 Tasikmalaya<br>
-                            Email: kecamatan.cisayong@tasikmalayakab.go.id - Website: www.cisayong.desa.id
+                        <div style="font-size: 9pt; line-height: 1.25; font-family: 'Times New Roman', Times, serif;">
+                            Jalan. Raya Cisayong Nomor. 20 Telepon. (0265) 420456<br>
+                            Faksimile 0265) 420456 (E-mail) cisayong@tasikmalayakab.go.id<br>
+                            Cisayong – 46153
                         </div>
                     </td>
                 </tr>
@@ -485,58 +486,86 @@ function unduhPdfLangsung() {
 
             <!-- ISI KONTEN SURAT BERDASARKAN JENIS SURAT -->
             <?php if ($jenis_surat === 'Alokasi Dana Daerah (ADD)'): ?>
-                <!-- MODEL SURAT DINAS RESMI (ADD DESA) -->
-                <table style="width: 100%; font-size: 11pt; margin-bottom: 12px;" cellpadding="0" cellspacing="0">
+                <!-- MODEL SURAT DINAS RESMI (ADD DESA SESUAI TEMPLATE DINAS OPD) -->
+                <table style="width: 100%; font-size: 11pt; margin-bottom: 10px;" cellpadding="0" cellspacing="0">
                     <tr>
-                        <td style="width: 58%; vertical-align: top;">
+                        <td style="width: 56%; vertical-align: top;">
                             <table style="width: 100%; font-size: 11pt; line-height: 1.35;" cellpadding="1" cellspacing="0">
-                                <tr><td style="width: 24%;">Nomor</td><td style="width: 4%;">:</td><td><?php echo htmlspecialchars($nomor_surat); ?></td></tr>
-                                <tr><td>Sifat</td><td>:</td><td><?php echo htmlspecialchars($template['sifat'] ?: 'Penting'); ?></td></tr>
+                                <tr><td style="width: 26%;">Nomor</td><td style="width: 4%;">:</td><td><?php echo htmlspecialchars($nomor_surat); ?></td></tr>
+                                <tr><td>Sifat</td><td>:</td><td><?php echo htmlspecialchars($template['sifat'] ?: 'Biasa'); ?></td></tr>
                                 <tr><td>Lampiran</td><td>:</td><td><?php echo htmlspecialchars($template['lampiran'] ?: '1 (satu) Berkas'); ?></td></tr>
-                                <tr><td>Perihal</td><td>:</td><td><strong><?php echo htmlspecialchars($template['perihal'] ?: 'Rekomendasi Pencairan Alokasi Dana Daerah (ADD)'); ?></strong></td></tr>
+                                <tr><td>Hal</td><td>:</td><td><strong><?php echo htmlspecialchars($template['perihal'] ?: 'Permohonan Rekomendasi Pencairan Alokasi Dana Desa (ADD)'); ?></strong></td></tr>
                             </table>
                         </td>
-                        <td style="width: 42%; vertical-align: top; text-align: left; padding-left: 18px; line-height: 1.35;">
-                            Cisayong, <?php echo $tanggal_surat_tampil; ?><br>
-                            Kepada Yth :<br>
-                            <strong>Bupati Tasikmalaya</strong><br>
-                            Melalui : Kepala DPMD Kab. Tasikmalaya<br>
+                        <td style="width: 44%; vertical-align: top; text-align: left; padding-left: 20px; line-height: 1.35;">
+                            Cisayong, <?php echo $tanggal_surat_tampil; ?><br><br>
+                            Kepada:<br>
+                            Yth. <strong>Kepala Dinas Pemberdayaan Masyarakat dan Desa</strong><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kabupaten Tasikmalaya<br>
                             di<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;<strong>SINGAPARNA</strong>
                         </td>
                     </tr>
                 </table>
 
-                <div style="font-size: 11pt; text-align: justify; margin-bottom: 10px; line-height: 1.35;">
-                    <p style="text-indent: 35px; margin: 0;">
-                        <?php echo nl2br(htmlspecialchars($pembuka_final)); ?>
+                <!-- Salam Pembuka Tulisan Arab -->
+                <div style="text-align: center; margin: 8px 0 10px 0; font-family: 'Traditional Arabic', 'Amiri', 'Times New Roman', serif;">
+                    <div style="font-size: 14pt; font-weight: bold; line-height: 1.2;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+                    <div style="font-size: 12pt; margin-top: 3px; font-weight: bold; line-height: 1.2;">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
+                </div>
+
+                <div style="font-size: 11pt; text-align: justify; margin-bottom: 8px; line-height: 1.4;">
+                    <p style="text-indent: 35px; margin: 0 0 6px 0;">
+                        <?php 
+                            $desa_nama_txt = $data_form['instansi_desa'] ?? ($desa_pemohon ?: 'Desa');
+                            $no_surat_desa_txt = !empty($data_form['nomor_surat_desa']) ? ' Nomor: ' . htmlspecialchars($data_form['nomor_surat_desa']) : '';
+                        ?>
+                        Berdasarkan Surat Permohonan dari Kepala Desa <?php echo htmlspecialchars($desa_nama_txt); ?><?php echo $no_surat_desa_txt; ?> perihal Permohonan Rekomendasi Pencairan Alokasi Dana Desa (ADD) <?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?> Tahun Anggaran <?php echo date('Y'); ?>, setelah diadakan penelitian kelengkapan berkas/persyaratan administrasi ternyata telah memenuhi ketentuan yang berlaku.
+                    </p>
+                    <p style="text-indent: 35px; margin: 0 0 6px 0;">
+                        Sehubungan hal tersebut di atas, bersama ini kami sampaikan Rekomendasi Pencairan Alokasi Dana Desa (ADD) Desa <?php echo htmlspecialchars($desa_nama_txt); ?> <?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?> dengan rincian sebagai berikut:
                     </p>
                 </div>
 
-                <?php if (!empty($data_form)): ?>
-                    <?php $is_long_form = count($data_form) > 7; ?>
-                <div style="margin: 0 0 <?php echo $is_long_form ? '6px' : '10px'; ?> 20px;">
-                    <table style="width: 96%; font-size: <?php echo $is_long_form ? '10pt' : '11pt'; ?>; line-height: <?php echo $is_long_form ? '1.2' : '1.3'; ?>;" cellpadding="1" cellspacing="0">
-                            <?php foreach ($data_form as $key => $val): 
-                                $label = ucwords(str_replace('_', ' ', $key));
-                                if ($key === 'jumlah_dana' && is_numeric($val)) {
-                                    $val = 'Rp ' . number_format((float)$val, 0, ',', '.');
-                                }
-                            ?>
-                                <tr>
-                                    <td style="width: 32%; vertical-align: top; padding: 1.5px 0;"><?php echo htmlspecialchars($label); ?></td>
-                                    <td style="width: 3%; vertical-align: top; padding: 1.5px 0;">:</td>
-                                    <td style="vertical-align: top; padding: 1.5px 0;"><strong><?php echo nl2br(htmlspecialchars((string)$val)); ?></strong></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </table>
-                    </div>
-                <?php endif; ?>
+                <div style="margin: 0 0 8px 25px;">
+                    <table style="width: 95%; font-size: 11pt; line-height: 1.3;" cellpadding="2" cellspacing="0">
+                        <tr>
+                            <td style="width: 32%; vertical-align: top;">Nama Kepala Desa</td>
+                            <td style="width: 3%; vertical-align: top;">:</td>
+                            <td style="vertical-align: top;"><strong><?php echo htmlspecialchars($data_form['nama_kades'] ?? '-'); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: top;">Pemerintah Desa</td>
+                            <td style="vertical-align: top;">:</td>
+                            <td style="vertical-align: top;"><strong><?php echo htmlspecialchars($desa_nama_txt); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: top;">Tahap Pencairan</td>
+                            <td style="vertical-align: top;">:</td>
+                            <td style="vertical-align: top;"><strong><?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: top;">Jumlah Dana (ADD)</td>
+                            <td style="vertical-align: top;">:</td>
+                            <td style="vertical-align: top;"><strong>Rp <?php echo is_numeric($data_form['jumlah_dana'] ?? '') ? number_format((float)$data_form['jumlah_dana'], 0, ',', '.') : htmlspecialchars($data_form['jumlah_dana'] ?? '0'); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: top;">Peruntukan Kegiatan</td>
+                            <td style="vertical-align: top;">:</td>
+                            <td style="vertical-align: top; text-align: justify;"><em><?php echo htmlspecialchars($data_form['peruntukan_dana'] ?? '-'); ?></em></td>
+                        </tr>
+                    </table>
+                </div>
 
-                <div style="font-size: 11pt; text-align: justify; margin-bottom: 14px; line-height: 1.35;">
+                <div style="font-size: 11pt; text-align: justify; margin-bottom: 6px; line-height: 1.4;">
                     <p style="text-indent: 35px; margin: 0;">
-                        <?php echo nl2br(htmlspecialchars($penutup_final)); ?>
+                        Demikian surat rekomendasi ini kami sampaikan untuk dipergunakan sebagaimana mestinya, atas perhatian dan kerjasamanya kami ucapkan terima kasih.
                     </p>
+                </div>
+
+                <!-- Salam Penutup Tulisan Arab -->
+                <div style="text-align: left; margin: 6px 0 12px 0; font-family: 'Traditional Arabic', 'Amiri', 'Times New Roman', serif;">
+                    <div style="font-size: 12pt; font-weight: bold; line-height: 1.2;">وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
                 </div>
 
             <?php elseif ($jenis_surat === 'Dispensasi Nikah'): ?>
@@ -697,19 +726,15 @@ function unduhPdfLangsung() {
                 </tr>
             </table>
 
-            <!-- FOOTER VERIFIKASI TTE BSrE & JEJAK PARAF KOORDINASI -->
+            <!-- FOOTER VERIFIKASI RESMI KECAMATAN -->
             <div style="border-top: 1px solid #94a3b8; padding-top: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 7.5pt; line-height: 1.3; color: #475569; font-family: 'Times New Roman', Times, serif;">
                 <div>
-                    <?php if ($is_ttd_dibubuhkan === 1): ?>
-                        Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik BSrE - BSSN.<br>
-                        <strong>Verifikasi Berjenjang:</strong> PTSP (<?php echo htmlspecialchars($pengajuan['ptsp_oleh'] ?? 'Valid'); ?>) • Paraf Kasi (<?php echo htmlspecialchars($pengajuan['paraf_kasi_oleh'] ?? 'Disetujui'); ?>) • Paraf Sekcam (<?php echo htmlspecialchars($pengajuan['paraf_sekcam_oleh'] ?? 'Disetujui'); ?>) • TTE Camat (<?php echo htmlspecialchars($pengajuan['ttd_dibubuhkan_oleh'] ?? 'Disahkan'); ?>)
-                    <?php else: ?>
-                        <strong>Status Dokumen:</strong> Telah melalui alur verifikasi PTSP, Kasi, dan Sekcam. Menunggu pembubuhan tanda tangan Camat.
-                    <?php endif; ?>
+                    Dokumen Pelayanan Resmi Kecamatan Cisayong Kabupaten Tasikmalaya.<br>
+                    <strong>Verifikasi Pelayanan:</strong> Front Office Layanan / PTSP (<?php echo htmlspecialchars($pengajuan['ptsp_oleh'] ?? 'Valid'); ?>) • Kasi Terkait (<?php echo htmlspecialchars($pengajuan['paraf_kasi_oleh'] ?? 'Disetujui'); ?>)
                 </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7pt; flex-shrink: 0;">
-                    <?php if ($is_ttd_dibubuhkan === 1): ?>
-                        ID TTE: <?php echo htmlspecialchars($tte_kode); ?>
+                <div style="text-align: right; font-family: monospace; font-size: 7.5pt; flex-shrink: 0;">
+                    <?php if ($status_norm === 'disetujui'): ?>
+                        <span style="color: #047857; font-weight: bold;">[ RESMI & SAH ]</span>
                     <?php else: ?>
                         <span style="color: #e11d48; font-weight: bold;">[ DRAFT ]</span>
                     <?php endif; ?>
@@ -848,7 +873,7 @@ function kirimManualWA(nama, nomor_surat, pengajuan_id) {
 
             const host = window.location.host;
             const dlUrl = window.location.protocol + '//' + host + baseUrl + 'surat/cetak_surat.php?id=' + pengajuan_id;
-            const msg = `🏛️ *PEMBERITAHUAN PELAYANAN SURAT DIGITAL*\n*KECAMATAN CISAYONG - KABUPATEN TASIKMALAYA*\n\nYth. Bpk/Ibu *${nama}*,\n\nPermohonan surat Anda telah *SELESAI DIPROSES & DITANDATANGANI SECARA RESMI*:\n📄 *Jenis Surat:* <?php echo htmlspecialchars(addslashes($jenis_surat)); ?>\n🔢 *Nomor Surat:* ${nomor_surat}\n✅ *Status:* Selesai (Approve & TTE Camat Cisayong)\n\nDokumen resmi ber-TTE kini siap diunduh langsung dalam format PDF siap cetak melalui tautan portal berikut:\n👉 ${dlUrl}\n\n_Pesan otomatis dari Sistem Pelayanan Surat Digital Kecamatan Cisayong._`;
+            const msg = `🏛️ *PEMBERITAHUAN PELAYANAN SURAT DIGITAL*\n*KECAMATAN CISAYONG - KABUPATEN TASIKMALAYA*\n\nYth. Bpk/Ibu *${nama}*,\n\nPermohonan surat Anda telah *SELESAI DIPROSES & DITERBITKAN RESMI*:\n📄 *Jenis Surat:* <?php echo htmlspecialchars(addslashes($jenis_surat)); ?>\n🔢 *Nomor Surat:* ${nomor_surat}\n✅ *Status:* Selesai & Disetujui\n\nDokumen resmi kini siap diunduh langsung dalam format PDF siap cetak melalui tautan portal berikut:\n👉 ${dlUrl}\n\n_Pesan otomatis dari Sistem Pelayanan Surat Digital Kecamatan Cisayong._`;
 
             window.open('https://api.whatsapp.com/send?phone=' + phone + '&text=' + encodeURIComponent(msg), '_blank');
         }

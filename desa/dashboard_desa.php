@@ -33,19 +33,21 @@ if ($revisi_id > 0) {
 
 // Handle Form Submit (Pengajuan Baru atau Upload Ulang Surat ADD)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama_kades      = trim($_POST['nama_kades'] ?? '');
-    $jumlah_dana     = trim($_POST['jumlah_dana'] ?? '');
-    $tahap_alokasi   = trim($_POST['tahap_alokasi'] ?? '');
-    $peruntukan_dana = trim($_POST['peruntukan_dana'] ?? '');
+    $nomor_surat_desa = trim($_POST['nomor_surat_desa'] ?? '');
+    $nama_kades       = trim($_POST['nama_kades'] ?? '');
+    $jumlah_dana      = trim($_POST['jumlah_dana'] ?? '');
+    $tahap_alokasi    = trim($_POST['tahap_alokasi'] ?? '');
+    $peruntukan_dana  = trim($_POST['peruntukan_dana'] ?? '');
 
     if (!empty($nama_kades) && !empty($jumlah_dana) && !empty($tahap_alokasi)) {
         $data_form = json_encode([
-            'nama_pemohon'    => $instansi_desa . ' (' . $nama_kades . ')',
-            'nama_kades'      => $nama_kades,
-            'instansi_desa'   => $instansi_desa,
-            'jumlah_dana'     => $jumlah_dana,
-            'tahap_alokasi'   => $tahap_alokasi,
-            'peruntukan_dana' => $peruntukan_dana
+            'nama_pemohon'     => $instansi_desa . ' (' . $nama_kades . ')',
+            'nomor_surat_desa' => $nomor_surat_desa,
+            'nama_kades'       => $nama_kades,
+            'instansi_desa'    => $instansi_desa,
+            'jumlah_dana'      => $jumlah_dana,
+            'tahap_alokasi'    => $tahap_alokasi,
+            'peruntukan_dana'  => $peruntukan_dana
         ]);
 
         try {
@@ -258,15 +260,11 @@ foreach ($pengajuan_list as $p) {
                                     </span>
                                     <?php if ($sInfo['step'] > 0): ?>
                                         <div class="flex items-center space-x-1 mt-2 text-[10px] font-bold">
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 1 ? 'bg-teal-800 text-white' : 'bg-slate-100 text-slate-400'; ?>">1.PTSP</span>
+                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 1 ? 'bg-teal-800 text-white' : 'bg-slate-100 text-slate-400'; ?>">1. Layanan PTSP</span>
                                             <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 2 ? 'bg-teal-800 text-white' : 'bg-slate-100 text-slate-400'; ?>">2.Kasi PMD</span>
+                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 2 ? 'bg-teal-800 text-white' : 'bg-slate-100 text-slate-400'; ?>">2. Kasi PMD</span>
                                             <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 3 ? 'bg-teal-800 text-white' : 'bg-slate-100 text-slate-400'; ?>">3.Sekcam</span>
-                                            <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 4 ? 'bg-teal-800 text-white' : 'bg-slate-100 text-slate-400'; ?>">4.Camat</span>
-                                            <span>→</span>
-                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 5 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'; ?>">5.PDF</span>
+                                            <span class="px-1.5 py-0.5 rounded <?php echo $sInfo['step'] >= 3 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'; ?>">3. Selesai</span>
                                         </div>
                                     <?php endif; ?>
                                 </td>
@@ -274,7 +272,7 @@ foreach ($pengajuan_list as $p) {
                                     <?php if ($row['status'] === 'ditolak'): ?>
                                         <span class="text-rose-700 font-bold"><?php echo htmlspecialchars($row['catatan_tolak'] ?: 'Silakan upload ulang berkas ADD.'); ?></span>
                                     <?php elseif ($row['status'] === 'disetujui'): ?>
-                                        <span class="text-emerald-700 font-bold">No: <?php echo htmlspecialchars($row['nomor_surat_generated']); ?> (TTE QR Code)</span>
+                                        <span class="text-emerald-700 font-bold">No: <?php echo htmlspecialchars($row['nomor_surat_generated']); ?> (Disetujui)</span>
                                     <?php else: ?>
                                         <span><?php echo htmlspecialchars($sInfo['desc']); ?></span>
                                     <?php endif; ?>
@@ -341,6 +339,10 @@ foreach ($pengajuan_list as $p) {
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Nama Pemerintah Desa</label>
                     <input type="text" value="<?php echo htmlspecialchars($instansi_desa); ?>" readonly class="w-full px-4 py-3.5 rounded-2xl border border-slate-200 bg-slate-100 text-slate-500 font-medium text-sm select-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Nomor Surat Pengantar / Permohonan Desa</label>
+                    <input type="text" name="nomor_surat_desa" value="<?php echo htmlspecialchars($revisi_form_data['nomor_surat_desa'] ?? ''); ?>" placeholder="Contoh: 140/08/Ds-2006/XI/2026" required class="w-full px-4 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:border-teal-800 bg-slate-50 text-slate-800 font-medium text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Nama Kepala Desa</label>

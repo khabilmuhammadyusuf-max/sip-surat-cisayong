@@ -56,8 +56,8 @@ if ($id && $_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: " . BASE_URL . "admin/dashboard_admin.php?msg=" . urlencode("Berkas $reg_number dinyatakan VALID oleh PTSP dan diteruskan ke " . get_role_label($kasi_tujuan) . "!"));
             exit;
 
-        } elseif ($action === 'paraf_kasi') {
-            // Tahap 2: Kasi Terkait -> Periksa Substansi & Redaksi + Paraf Digital -> Teruskan ke Sekcam
+        } elseif ($action === 'paraf_kasi' || $action === 'approve_kasi') {
+            // Tahap 2: Kasi Terkait -> Periksa Substansi & Redaksi + Persetujuan Akhir -> Langsung Terbitkan Surat (Status Disetujui)
             $existing_form = json_decode($pengajuan['data_form'], true) ?? [];
             if (isset($_POST['substansi']) && is_array($_POST['substansi'])) {
                 foreach ($_POST['substansi'] as $k => $v) {
@@ -67,11 +67,32 @@ if ($id && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $new_data_form = json_encode($existing_form);
             $redaksi_pembuka = trim($_POST['redaksi_kasi_pembuka'] ?? '');
             $redaksi_penutup = trim($_POST['redaksi_kasi_penutup'] ?? '');
-            $catatan_kasi    = trim($_POST['catatan_kasi'] ?? 'Substansi & redaksi surat telah diperiksa dan sesuai.');
+            $catatan_kasi    = trim($_POST['catatan_kasi'] ?? 'Substansi dan redaksi surat telah diperiksa, disetujui, dan diterbitkan.');
             $jabatan_kasi    = get_role_label($pengajuan['kasi_tujuan'] ?: $user_role);
 
-            $stmtUpd = $pdo->prepare("UPDATE `pengajuan` SET status = 'menunggu_sekcam', data_form = ?, redaksi_kasi_pembuka = ?, redaksi_kasi_penutup = ?, paraf_kasi_oleh = ?, paraf_kasi_nip = ?, paraf_kasi_jabatan = ?, waktu_paraf_kasi = NOW(), catatan_kasi = ? WHERE id = ?");
+            // Generate nomor surat otomatis
+            $stmtTmpl = $pdo->prepare("SELECT * FROM `templates` WHERE jenis_surat = ?");
+            $stmtTmpl->execute([$pengajuan['jenis_surat']]);
+            $template = $stmtTmpl->fetch();
+
+            $tahun = date('Y');
+            $stmtMax = $pdo->prepare("SELECT MAX(nomor_urut) FROM `pengajuan` WHERE jenis_surat = ? AND YEAR(waktu_verifikasi) = ?");
+            $stmtMax->execute([$pengajuan['jenis_surat'], $tahun]);
+            $max_urut = (int)$stmtMax->fetchColumn();
+            $next_urut = $max_urut + 1;
+
+            $kode_klas = $template['kode_klasifikasi'] ?? '400';
+            $fmt_nomor = $template['format_nomor'] ?? '[KODE]/[URUT]/Kec/[TAHUN]';
+            $nomor_surat = str_replace(
+                ['[KODE]', '[URUT]', '[TAHUN]'],
+                [$kode_klas, $next_urut, $tahun],
+                $fmt_nomor
+            );
+
+            $stmtUpd = $pdo->prepare("UPDATE `pengajuan` SET status = 'disetujui', nomor_surat_generated = ?, nomor_urut = ?, data_form = ?, redaksi_kasi_pembuka = ?, redaksi_kasi_penutup = ?, paraf_kasi_oleh = ?, paraf_kasi_nip = ?, paraf_kasi_jabatan = ?, waktu_paraf_kasi = NOW(), waktu_verifikasi = NOW(), catatan_kasi = ? WHERE id = ?");
             $stmtUpd->execute([
+                $nomor_surat,
+                $next_urut,
                 $new_data_form,
                 $redaksi_pembuka ?: null,
                 $redaksi_penutup ?: null,
@@ -81,7 +102,7 @@ if ($id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $catatan_kasi,
                 $id
             ]);
-            header("Location: " . BASE_URL . "admin/dashboard_admin.php?msg=" . urlencode("Substansi & Redaksi $reg_number disetujui (Paraf Digital Kasi) dan diteruskan ke Sekretaris Camat!"));
+            header("Location: " . BASE_URL . "surat/cetak_surat.php?id=" . $id . "&generated=1");
             exit;
 
         } elseif ($action === 'paraf_sekcam') {
@@ -310,12 +331,12 @@ $lampiran_list = $stmtL->fetchAll();
             </span>
         </div>
 
-        <!-- 5 Stage Stepper Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-1">
+        <!-- 3 Stage Stepper Grid (Alur Terpadu: Layanan PTSP -> Kasi Terkait -> Selesai) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <!-- Step 1: PTSP -->
             <div class="p-3.5 rounded-2xl border <?php echo $status_norm === 'menunggu_ptsp' ? 'border-amber-400 bg-amber-50/60 ring-2 ring-amber-200' : (!empty($pengajuan['waktu_validasi_ptsp']) ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50'); ?>">
                 <div class="flex items-center justify-between text-xs font-extrabold">
-                    <span class="text-slate-800">1. Front Office (PTSP)</span>
+                    <span class="text-slate-800">1. Front Office (Layanan / PTSP)</span>
                     <?php if (!empty($pengajuan['waktu_validasi_ptsp'])): ?>
                         <span class="material-icons-outlined text-emerald-600 text-base">check_circle</span>
                     <?php elseif ($status_norm === 'menunggu_ptsp'): ?>
@@ -338,50 +359,20 @@ $lampiran_list = $stmtL->fetchAll();
                     <?php endif; ?>
                 </div>
                 <p class="text-[11px] text-slate-500 mt-1">
-                    <?php echo !empty($pengajuan['waktu_paraf_kasi']) ? 'Paraf: ' . htmlspecialchars($pengajuan['paraf_kasi_oleh']) : 'Periksa Substansi & Redaksi'; ?>
+                    <?php echo !empty($pengajuan['waktu_paraf_kasi']) ? 'Disetujui: ' . htmlspecialchars($pengajuan['paraf_kasi_oleh']) : 'Pemeriksaan & Persetujuan Akhir'; ?>
                 </p>
             </div>
 
-            <!-- Step 3: Sekcam -->
-            <div class="p-3.5 rounded-2xl border <?php echo $status_norm === 'menunggu_sekcam' ? 'border-indigo-500 bg-indigo-50/60 ring-2 ring-indigo-200' : (!empty($pengajuan['waktu_paraf_sekcam']) ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50'); ?>">
-                <div class="flex items-center justify-between text-xs font-extrabold">
-                    <span class="text-slate-800">3. Sekretaris Camat</span>
-                    <?php if (!empty($pengajuan['waktu_paraf_sekcam'])): ?>
-                        <span class="material-icons-outlined text-emerald-600 text-base">check_circle</span>
-                    <?php elseif ($status_norm === 'menunggu_sekcam'): ?>
-                        <span class="material-icons-outlined text-indigo-700 text-base">fact_check</span>
-                    <?php endif; ?>
-                </div>
-                <p class="text-[11px] text-slate-500 mt-1">
-                    <?php echo !empty($pengajuan['waktu_paraf_sekcam']) ? 'Paraf: ' . htmlspecialchars($pengajuan['paraf_sekcam_oleh']) : 'Paraf Koordinasi Sekcam'; ?>
-                </p>
-            </div>
-
-            <!-- Step 4: Camat -->
-            <div class="p-3.5 rounded-2xl border <?php echo $status_norm === 'menunggu_camat' ? 'border-purple-500 bg-purple-50/60 ring-2 ring-purple-200' : ($status_norm === 'disetujui' ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50'); ?>">
-                <div class="flex items-center justify-between text-xs font-extrabold">
-                    <span class="text-slate-800">4. Camat Cisayong</span>
-                    <?php if ($status_norm === 'disetujui'): ?>
-                        <span class="material-icons-outlined text-emerald-600 text-base">verified</span>
-                    <?php elseif ($status_norm === 'menunggu_camat'): ?>
-                        <span class="material-icons-outlined text-purple-700 text-base">draw</span>
-                    <?php endif; ?>
-                </div>
-                <p class="text-[11px] text-slate-500 mt-1">
-                    <?php echo $status_norm === 'disetujui' ? 'TTE: ' . htmlspecialchars($pengajuan['tte_camat_oleh'] ?? 'Camat') : 'Approve & TTE (QR Code)'; ?>
-                </p>
-            </div>
-
-            <!-- Step 5: Generate PDF -->
+            <!-- Step 3: Selesai -->
             <div class="p-3.5 rounded-2xl border <?php echo $status_norm === 'disetujui' ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200' : 'border-slate-200 bg-slate-50'; ?>">
                 <div class="flex items-center justify-between text-xs font-extrabold">
-                    <span class="text-slate-800">5. Generate PDF</span>
+                    <span class="text-slate-800">3. Selesai (Surat Siap Unduh)</span>
                     <?php if ($status_norm === 'disetujui'): ?>
-                        <span class="material-icons-outlined text-emerald-600 text-base">picture_as_pdf</span>
+                        <span class="material-icons-outlined text-emerald-600 text-base">task_alt</span>
                     <?php endif; ?>
                 </div>
                 <p class="text-[11px] text-slate-500 mt-1">
-                    <?php echo $status_norm === 'disetujui' ? 'Siap Diunduh Pemohon' : 'Menunggu TTE Camat'; ?>
+                    <?php echo $status_norm === 'disetujui' ? 'Surat Telah Diterbitkan' : 'Menunggu Persetujuan Kasi'; ?>
                 </p>
             </div>
         </div>
@@ -477,8 +468,8 @@ $lampiran_list = $stmtL->fetchAll();
                     </div>
 
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Catatan Paraf Kasi ke Sekretaris Camat</label>
-                        <input type="text" name="catatan_kasi" value="Substansi dan redaksi surat telah diperiksa serta memenuhi ketentuan." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-slate-50">
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Catatan Persetujuan Kasi / Keterangan Penerbitan</label>
+                        <input type="text" name="catatan_kasi" value="Substansi dan redaksi surat telah diperiksa, memenuhi ketentuan, dan disetujui untuk diterbitkan." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-slate-50">
                     </div>
                 </div>
 
@@ -487,9 +478,9 @@ $lampiran_list = $stmtL->fetchAll();
                         <span class="material-icons-outlined text-lg">cancel</span>
                         <span>Tolak Berkas</span>
                     </button>
-                    <button type="submit" class="bg-blue-900 hover:bg-blue-800 text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg shadow-blue-900/20 flex items-center space-x-2 transition-all">
-                        <span class="material-icons-outlined text-lg">verified</span>
-                        <span>Setuju (Paraf Digital Kasi) → Teruskan ke Sekcam</span>
+                    <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-lg shadow-emerald-700/25 flex items-center space-x-2 transition-all">
+                        <span class="material-icons-outlined text-lg">task_alt</span>
+                        <span>Setujui & Terbitkan Surat Resmi</span>
                     </button>
                 </div>
             </form>

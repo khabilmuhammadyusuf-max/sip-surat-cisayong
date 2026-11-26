@@ -143,8 +143,8 @@ if (!function_exists('get_status_info')) {
                 return [
                     'code'        => 'menunggu_ptsp',
                     'step'        => 1,
-                    'label'       => 'Verifikasi Front Office (PTSP)',
-                    'short_label' => 'Di Meja PTSP',
+                    'label'       => 'Verifikasi Berkas (Layanan / PTSP)',
+                    'short_label' => 'Di Meja Layanan (PTSP)',
                     'badge_class' => 'bg-amber-50 text-amber-800 border-amber-200',
                     'icon'        => 'support_agent',
                     'desc'        => 'Menunggu pemeriksaan kelengkapan berkas oleh petugas Front Office (PTSP) Kecamatan.'
@@ -153,41 +153,32 @@ if (!function_exists('get_status_info')) {
                 return [
                     'code'        => 'menunggu_kasi',
                     'step'        => 2,
-                    'label'       => 'Periksa Substansi (' . $kasi_label . ')',
+                    'label'       => 'Pemeriksaan & Persetujuan (' . $kasi_label . ')',
                     'short_label' => 'Di Meja ' . $kasi_label,
                     'badge_class' => 'bg-blue-50 text-blue-900 border-blue-200',
                     'icon'        => 'rate_review',
-                    'desc'        => 'Berkas dinyatakan lengkap oleh PTSP dan sedang diperiksa substansi & redaksi oleh ' . $kasi_label . '.'
+                    'desc'        => 'Berkas lengkap dan sedang diperiksa substansi serta persetujuan akhir oleh ' . $kasi_label . '.'
                 ];
             case 'menunggu_sekcam':
-                return [
-                    'code'        => 'menunggu_sekcam',
-                    'step'        => 3,
-                    'label'       => 'Paraf Koordinasi Sekcam',
-                    'short_label' => 'Di Meja Sekcam',
-                    'badge_class' => 'bg-indigo-50 text-indigo-800 border-indigo-200',
-                    'icon'        => 'fact_check',
-                    'desc'        => 'Telah diparaf oleh Kasi Terkait, menunggu Paraf Koordinasi Sekretaris Camat (Sekcam).'
-                ];
             case 'menunggu_camat':
                 return [
-                    'code'        => 'menunggu_camat',
-                    'step'        => 4,
-                    'label'       => 'Menunggu Approve & TTE Camat',
-                    'short_label' => 'Di Meja Camat',
-                    'badge_class' => 'bg-purple-50 text-purple-800 border-purple-200',
-                    'icon'        => 'verified_user',
-                    'desc'        => 'Telah diparaf koordinasi oleh Sekcam, menunggu Persetujuan Akhir & TTE (QR Code) Camat.'
+                    'code'        => $status,
+                    'step'        => 2,
+                    'label'       => 'Proses Persetujuan',
+                    'short_label' => 'Persetujuan Layanan',
+                    'badge_class' => 'bg-indigo-50 text-indigo-800 border-indigo-200',
+                    'icon'        => 'fact_check',
+                    'desc'        => 'Sedang dalam proses persetujuan dan penerbitan naskah surat.'
                 ];
             case 'disetujui':
                 return [
                     'code'        => 'disetujui',
-                    'step'        => 5,
-                    'label'       => 'Selesai • TTE & PDF Siap Unduh',
+                    'step'        => 3,
+                    'label'       => 'Selesai • Surat Siap Unduh',
                     'short_label' => 'Selesai (Siap Unduh)',
                     'badge_class' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
-                    'icon'        => 'qr_code_2',
-                    'desc'        => 'Telah di-Approve & TTE (QR Code) oleh Camat. Dokumen PDF resmi siap diunduh dari akun.'
+                    'icon'        => 'task_alt',
+                    'desc'        => 'Surat telah disetujui dan diterbitkan secara resmi. Dokumen PDF & Word siap diunduh.'
                 ];
             case 'ditolak':
                 return [
@@ -269,8 +260,8 @@ if (!function_exists('get_whatsapp_notification_url')) {
                  . "Permohonan surat Anda telah *SELESAI DIPROSES & DITANDATANGANI SECARA RESMI*:\n"
                  . "📄 *Jenis Surat:* {$jenis_surat}\n"
                  . "🔢 *Nomor Surat:* {$nomor_surat}\n"
-                 . "✅ *Status:* Selesai (Approve & TTE Camat Cisayong)\n\n"
-                 . "Dokumen resmi ber-TTE kini siap diunduh langsung dalam format PDF siap cetak melalui tautan portal berikut:\n"
+                 . "✅ *Status:* Selesai (Disetujui & Diterbitkan Resmi)\n\n"
+                 . "Dokumen resmi kini siap diunduh langsung dalam format PDF & Word siap cetak melalui tautan portal berikut:\n"
                  . "👉 {$download_url}\n\n"
                  . "_Pesan otomatis dari Sistem Pelayanan Surat Digital Kecamatan Cisayong._";
         } elseif ($status === 'ditolak') {

@@ -162,18 +162,11 @@ p {
                 <img src="<?php echo $logo_src; ?>" width="65" height="70" alt="Logo Tasikmalaya">
             </td>
             <td width="85%" align="center" valign="middle" style="padding-bottom: 8px; padding-right: 65px;">
-                <?php if ($jenis_surat === 'Dispensasi Nikah'): ?>
-                    <div style="font-size: 15pt; font-weight: bold; margin-bottom: 2px;">PEMERINTAH KABUPATEN TASIKMALAYA</div>
-                    <div style="font-size: 19pt; font-weight: bold; margin-bottom: 2px;">KECAMATAN CISAYONG</div>
-                    <div style="font-size: 10.5pt;">Jalan. Raya Cisayong Nomor. 20 Telepon. (0265) 420456</div>
-                    <div style="font-size: 10.5pt;">Faksimile 0265) 420456 (E-mail) cisayong@tasikmalayakab.go.id</div>
-                    <div style="font-size: 10.5pt;">Cisayong - 46153</div>
-                <?php else: ?>
-                    <div style="font-size: 15pt; font-weight: bold; margin-bottom: 2px;">PEMERINTAH DAERAH KABUPATEN TASIKMALAYA</div>
-                    <div style="font-size: 19pt; font-weight: bold; margin-bottom: 2px;">KECAMATAN CISAYONG</div>
-                    <div style="font-size: 10.5pt;">Jln . Raya Cisayong No. 20 Cisayong - Tasikmalaya Kode Pos 46153</div>
-                    <div style="font-size: 10.5pt;">Telp. ( 0265 ) 420456 Fax ( 0265 ) 420456 ( E-mail ) cisayong@tasikmalayaka.go.id</div>
-                <?php endif; ?>
+                <div style="font-size: 14pt; font-weight: bold; margin-bottom: 2px;">PEMERINTAH KABUPATEN TASIKMALAYA</div>
+                <div style="font-size: 18pt; font-weight: bold; margin-bottom: 2px;">KECAMATAN CISAYONG</div>
+                <div style="font-size: 10pt;">Jalan. Raya Cisayong Nomor. 20 Telepon. (0265) 420456</div>
+                <div style="font-size: 10pt;">Faksimile 0265) 420456 (E-mail) cisayong@tasikmalayakab.go.id</div>
+                <div style="font-size: 10pt;">Cisayong – 46153</div>
             </td>
         </tr>
     </table>
@@ -207,15 +200,30 @@ p {
         </div>
 
         <!-- Tubuh Surat -->
-        <div style="text-align: justify; margin-bottom: 10px;">
-            <p style="text-indent: 40px; margin: 0;">
-                <?php echo nl2br(htmlspecialchars($template['pembuka'])); ?>
+        <?php 
+            $desa_nama_txt = $data_form['instansi_desa'] ?? ($desa_pemohon ?: 'Desa');
+            $no_surat_desa_txt = !empty($data_form['nomor_surat_desa']) ? ' Nomor: ' . htmlspecialchars($data_form['nomor_surat_desa']) : '';
+        ?>
+        <div style="text-align: justify; margin-bottom: 8px;">
+            <p style="text-indent: 40px; margin: 0 0 6px 0;">
+                Berdasarkan Surat Permohonan dari Kepala Desa <?php echo htmlspecialchars($desa_nama_txt); ?><?php echo $no_surat_desa_txt; ?> perihal Permohonan Rekomendasi Pencairan Alokasi Dana Desa (ADD) <?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?> Tahun Anggaran <?php echo date('Y'); ?>, setelah diadakan penelitian kelengkapan berkas/persyaratan administrasi ternyata telah memenuhi ketentuan yang berlaku.
+            </p>
+            <p style="text-indent: 40px; margin: 0 0 6px 0;">
+                Sehubungan hal tersebut di atas, bersama ini kami sampaikan Rekomendasi Pencairan Alokasi Dana Desa (ADD) Desa <?php echo htmlspecialchars($desa_nama_txt); ?> <?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?> dengan rincian sebagai berikut:
             </p>
         </div>
 
-        <div style="text-align: justify; margin-bottom: 14px;">
+        <table width="95%" cellpadding="3" cellspacing="0" style="margin: 0 0 10px 30px; font-size: 11pt;">
+            <tr><td width="32%" valign="top">Nama Kepala Desa</td><td width="3%" valign="top">:</td><td valign="top"><strong><?php echo htmlspecialchars($data_form['nama_kades'] ?? '-'); ?></strong></td></tr>
+            <tr><td valign="top">Pemerintah Desa</td><td valign="top">:</td><td valign="top"><strong><?php echo htmlspecialchars($desa_nama_txt); ?></strong></td></tr>
+            <tr><td valign="top">Tahap Pencairan</td><td valign="top">:</td><td valign="top"><strong><?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?></strong></td></tr>
+            <tr><td valign="top">Jumlah Dana (ADD)</td><td valign="top">:</td><td valign="top"><strong>Rp <?php echo is_numeric($data_form['jumlah_dana'] ?? '') ? number_format((float)$data_form['jumlah_dana'], 0, ',', '.') : htmlspecialchars($data_form['jumlah_dana'] ?? '0'); ?></strong></td></tr>
+            <tr><td valign="top">Peruntukan Kegiatan</td><td valign="top">:</td><td valign="top"><em><?php echo htmlspecialchars($data_form['peruntukan_dana'] ?? '-'); ?></em></td></tr>
+        </table>
+
+        <div style="text-align: justify; margin-bottom: 10px;">
             <p style="text-indent: 40px; margin: 0;">
-                <?php echo nl2br(htmlspecialchars($template['penutup'])); ?>
+                Demikian surat rekomendasi ini kami sampaikan untuk dipergunakan sebagaimana mestinya, atas perhatian dan kerjasamanya kami ucapkan terima kasih.
             </p>
         </div>
 

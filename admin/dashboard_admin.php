@@ -60,15 +60,11 @@ foreach ($pengajuan_list as $p) {
             <h2 class="text-3xl font-extrabold tracking-tight">Alur Pelayanan Terpadu Kecamatan Cisayong</h2>
             <p class="text-blue-100 text-sm max-w-2xl">
                 <?php if ($user_role === 'ptsp'): ?>
-                    Periksa kelengkapan berkas dari Warga (Surat Umum) dan Admin Desa (Surat ADD). Tolak untuk upload ulang jika kurang lengkap, atau teruskan ke Kasi Terkait jika valid.
+                    Periksa kelengkapan berkas dari Warga (Surat Umum) dan Admin Desa (Surat ADD). Kembalikan jika belum lengkap, atau teruskan ke Kasi Terkait jika valid.
                 <?php elseif (is_kasi_role($user_role)): ?>
-                    Periksa substansi permohonan & redaksi surat pada bidang Anda, lalu berikan <strong>Paraf Digital Kasi</strong> untuk diteruskan ke Sekretaris Camat.
-                <?php elseif ($user_role === 'sekcam'): ?>
-                    Periksa berkas yang telah diparaf oleh Kasi Terkait, lalu berikan <strong>Paraf Koordinasi Sekcam</strong> untuk diteruskan ke meja Camat.
-                <?php elseif ($user_role === 'camat'): ?>
-                    Periksa surat yang telah melalui validasi PTSP, Paraf Kasi, dan Paraf Koordinasi Sekcam. Berikan <strong>Approve & TTE (QR Code)</strong> untuk menerbitkan PDF resmi.
+                    Periksa substansi permohonan & redaksi surat pada bidang Anda, lalu berikan <strong>Persetujuan & Terbitkan Surat Resmi</strong> secara langsung.
                 <?php else: ?>
-                    Pantau dan kelola seluruh tahapan verifikasi berjenjang (PTSP → Kasi Terkait → Sekcam → Camat TTE).
+                    Pantau dan kelola seluruh tahapan verifikasi terpadu (Front Office Layanan → Kasi Terkait → Surat Resmi Diterbitkan).
                 <?php endif; ?>
             </p>
         </div>
@@ -110,9 +106,9 @@ foreach ($pengajuan_list as $p) {
         </div>
     <?php endif; ?>
 
-    <!-- 5-Stage Pipeline Analytics Cards (Klik untuk Filter Otomatis) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div onclick="filterTahapan('menunggu_ptsp')" title="Klik untuk memfilter antrean di Meja PTSP" class="cursor-pointer bg-white p-5 rounded-2xl border <?php echo $user_role === 'ptsp' ? 'border-amber-400 ring-2 ring-amber-100' : 'border-slate-200'; ?> shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
+    <!-- Pipeline Analytics Cards (Alur Terpadu: Layanan PTSP -> Kasi -> Selesai) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div onclick="filterTahapan('menunggu_ptsp')" title="Klik untuk memfilter antrean di Meja Layanan / PTSP" class="cursor-pointer bg-white p-5 rounded-2xl border <?php echo $user_role === 'ptsp' ? 'border-amber-400 ring-2 ring-amber-100' : 'border-slate-200'; ?> shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
             <div class="flex items-center justify-between mb-2">
                 <span class="w-9 h-9 bg-amber-50 text-amber-700 rounded-xl flex items-center justify-center">
                     <span class="material-icons-outlined text-lg">support_agent</span>
@@ -120,7 +116,7 @@ foreach ($pengajuan_list as $p) {
                 <span class="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">TAHAP 1</span>
             </div>
             <p class="text-2xl font-black text-slate-800"><?php echo $stats['menunggu_ptsp']; ?></p>
-            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Front Office (PTSP)</p>
+            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Front Office (Layanan / PTSP)</p>
         </div>
 
         <div onclick="filterTahapan('menunggu_kasi')" title="Klik untuk memfilter antrean di Meja Kasi Terkait" class="cursor-pointer bg-white p-5 rounded-2xl border <?php echo is_kasi_role($user_role) ? 'border-blue-500 ring-2 ring-blue-100' : 'border-slate-200'; ?> shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
@@ -131,40 +127,18 @@ foreach ($pengajuan_list as $p) {
                 <span class="text-[10px] font-extrabold text-blue-900 bg-blue-50 px-2 py-0.5 rounded-full">TAHAP 2</span>
             </div>
             <p class="text-2xl font-black text-slate-800"><?php echo $stats['menunggu_kasi']; ?></p>
-            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Kasi Terkait (Paraf)</p>
+            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Kasi Terkait (Pemeriksaan & Setujui)</p>
         </div>
 
-        <div onclick="filterTahapan('menunggu_sekcam')" title="Klik untuk memfilter antrean di Meja Sekcam" class="cursor-pointer bg-white p-5 rounded-2xl border <?php echo $user_role === 'sekcam' ? 'border-indigo-500 ring-2 ring-indigo-100' : 'border-slate-200'; ?> shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
-            <div class="flex items-center justify-between mb-2">
-                <span class="w-9 h-9 bg-indigo-50 text-indigo-800 rounded-xl flex items-center justify-center">
-                    <span class="material-icons-outlined text-lg">fact_check</span>
-                </span>
-                <span class="text-[10px] font-extrabold text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded-full">TAHAP 3</span>
-            </div>
-            <p class="text-2xl font-black text-slate-800"><?php echo $stats['menunggu_sekcam']; ?></p>
-            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Sekcam (Koordinasi)</p>
-        </div>
-
-        <div onclick="filterTahapan('menunggu_camat')" title="Klik untuk memfilter antrean di Meja Camat" class="cursor-pointer bg-white p-5 rounded-2xl border <?php echo $user_role === 'camat' ? 'border-purple-500 ring-2 ring-purple-100' : 'border-slate-200'; ?> shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
-            <div class="flex items-center justify-between mb-2">
-                <span class="w-9 h-9 bg-purple-50 text-purple-800 rounded-xl flex items-center justify-center">
-                    <span class="material-icons-outlined text-lg">verified_user</span>
-                </span>
-                <span class="text-[10px] font-extrabold text-purple-800 bg-purple-50 px-2 py-0.5 rounded-full">TAHAP 4</span>
-            </div>
-            <p class="text-2xl font-black text-slate-800"><?php echo $stats['menunggu_camat']; ?></p>
-            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Camat (Approve & TTE)</p>
-        </div>
-
-        <div onclick="filterTahapan('disetujui')" title="Klik untuk memfilter surat selesai yang telah ber-TTE" class="cursor-pointer bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
+        <div onclick="filterTahapan('disetujui')" title="Klik untuk memfilter surat selesai yang telah diterbitkan" class="cursor-pointer bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
             <div class="flex items-center justify-between mb-2">
                 <span class="w-9 h-9 bg-emerald-50 text-emerald-700 rounded-xl flex items-center justify-center">
-                    <span class="material-icons-outlined text-lg">qr_code_2</span>
+                    <span class="material-icons-outlined text-lg">task_alt</span>
                 </span>
                 <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">SELESAI</span>
             </div>
             <p class="text-2xl font-black text-slate-800"><?php echo $stats['disetujui']; ?></p>
-            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Terbit PDF & TTE</p>
+            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Surat Resmi Diterbitkan</p>
         </div>
 
         <div onclick="filterTahapan('ditolak')" title="Klik untuk memfilter berkas yang dikembalikan / ditolak" class="cursor-pointer bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all">
@@ -175,7 +149,7 @@ foreach ($pengajuan_list as $p) {
                 <span class="text-[10px] font-extrabold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full">REVISI</span>
             </div>
             <p class="text-2xl font-black text-slate-800"><?php echo $stats['ditolak']; ?></p>
-            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Ditolak / Upload Ulang</p>
+            <p class="text-[11px] font-bold text-slate-500 mt-0.5">Ditolak / Perbaikan Berkas</p>
         </div>
     </div>
 
