@@ -284,3 +284,36 @@ if (!function_exists('get_whatsapp_notification_url')) {
         return "https://api.whatsapp.com/send?phone=" . $wa_phone . "&text=" . urlencode($msg);
     }
 }
+
+// =============================================================================
+// HELPER TERBILANG MATA UANG INDONESIA
+// =============================================================================
+if (!function_exists('terbilang_angka')) {
+    function terbilang_angka($nilai) {
+        $nilai = abs((float)$nilai);
+        $huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+        $temp = "";
+        if ($nilai < 12) {
+            $temp = " " . $huruf[(int)$nilai];
+        } else if ($nilai < 20) {
+            $temp = terbilang_angka($nilai - 10) . " Belas";
+        } else if ($nilai < 100) {
+            $temp = terbilang_angka((int)($nilai / 10)) . " Puluh " . terbilang_angka($nilai % 10);
+        } else if ($nilai < 200) {
+            $temp = " Seratus " . terbilang_angka($nilai - 100);
+        } else if ($nilai < 1000) {
+            $temp = terbilang_angka((int)($nilai / 100)) . " Ratus " . terbilang_angka($nilai % 100);
+        } else if ($nilai < 2000) {
+            $temp = " Seribu " . terbilang_angka($nilai - 1000);
+        } else if ($nilai < 1000000) {
+            $temp = terbilang_angka((int)($nilai / 1000)) . " Ribu " . terbilang_angka($nilai % 1000);
+        } else if ($nilai < 1000000000) {
+            $temp = terbilang_angka((int)($nilai / 1000000)) . " Juta " . terbilang_angka($nilai % 1000000);
+        } else if ($nilai < 1000000000000) {
+            $temp = terbilang_angka((int)($nilai / 1000000000)) . " Miliar " . terbilang_angka(fmod($nilai, 1000000000));
+        } else if ($nilai < 1000000000000000) {
+            $temp = terbilang_angka((int)($nilai / 1000000000000)) . " Triliun " . terbilang_angka(fmod($nilai, 1000000000000));
+        }
+        return trim(preg_replace('/\s+/', ' ', $temp));
+    }
+}

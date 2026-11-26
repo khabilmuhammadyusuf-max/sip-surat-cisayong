@@ -486,86 +486,83 @@ function unduhPdfLangsung() {
 
             <!-- ISI KONTEN SURAT BERDASARKAN JENIS SURAT -->
             <?php if ($jenis_surat === 'Alokasi Dana Daerah (ADD)'): ?>
-                <!-- MODEL SURAT DINAS RESMI (ADD DESA SESUAI TEMPLATE DINAS OPD) -->
-                <table style="width: 100%; font-size: 11pt; margin-bottom: 10px;" cellpadding="0" cellspacing="0">
+                <?php 
+                    $desa_nama_txt = $data_form['instansi_desa'] ?? ($desa_pemohon ?: 'Desa');
+                    $nomor_desa_val = !empty($data_form['nomor_surat_desa']) ? $data_form['nomor_surat_desa'] : '025/B.KU.03.02/DS/' . date('Y');
+                    $nominal_num = is_numeric($data_form['jumlah_dana'] ?? '') ? (float)$data_form['jumlah_dana'] : 0;
+                    $nominal_fmt = number_format($nominal_num, 0, ',', '.');
+                    $terbilang_txt = !empty($nominal_num) ? ucwords(terbilang_angka($nominal_num)) . ' Rupiah' : 'Nol Rupiah';
+                    $peruntukan_val = !empty($data_form['peruntukan_dana']) && $data_form['peruntukan_dana'] !== '-' ? $data_form['peruntukan_dana'] : ($data_form['tahap_alokasi'] ?? 'Bulan Berjalan');
+                    $tgl_surat_desa = !empty($pengajuan['waktu_pengajuan']) ? tanggal_indonesia(strtotime($pengajuan['waktu_pengajuan'])) : $tanggal_surat_tampil;
+                    $bulan_list_id = [
+                        'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret',
+                        'April' => 'April', 'May' => 'Mei', 'June' => 'Juni',
+                        'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September',
+                        'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'
+                    ];
+                    $cur_m = date('F', strtotime($pengajuan['waktu_pengajuan'] ?? 'now'));
+                    $bulan_absen_id = $bulan_list_id[$cur_m] ?? date('m');
+                ?>
+                <!-- MODEL SURAT DINAS RESMI (ADD DESA SESUAI CONTOH CETAK RESMI KECAMATAN) -->
+                <table style="width: 100%; font-size: 11pt; margin-bottom: 8px;" cellpadding="0" cellspacing="0">
                     <tr>
-                        <td style="width: 56%; vertical-align: top;">
-                            <table style="width: 100%; font-size: 11pt; line-height: 1.35;" cellpadding="1" cellspacing="0">
-                                <tr><td style="width: 26%;">Nomor</td><td style="width: 4%;">:</td><td><?php echo htmlspecialchars($nomor_surat); ?></td></tr>
-                                <tr><td>Sifat</td><td>:</td><td><?php echo htmlspecialchars($template['sifat'] ?: 'Biasa'); ?></td></tr>
-                                <tr><td>Lampiran</td><td>:</td><td><?php echo htmlspecialchars($template['lampiran'] ?: '1 (satu) Berkas'); ?></td></tr>
-                                <tr><td>Hal</td><td>:</td><td><strong><?php echo htmlspecialchars($template['perihal'] ?: 'Permohonan Rekomendasi Pencairan Alokasi Dana Desa (ADD)'); ?></strong></td></tr>
+                        <td style="width: 58%; vertical-align: top;">
+                            <table style="width: 100%; font-size: 11pt; line-height: 1.3;" cellpadding="1" cellspacing="0">
+                                <tr><td style="width: 25%; vertical-align: top;">Nomor</td><td style="width: 4%; vertical-align: top;">:</td><td style="vertical-align: top;"><?php echo htmlspecialchars($nomor_surat); ?></td></tr>
+                                <tr><td style="vertical-align: top;">Sifat</td><td style="vertical-align: top;">:</td><td style="vertical-align: top;"><?php echo htmlspecialchars($template['sifat'] ?: 'Penting'); ?></td></tr>
+                                <tr><td style="vertical-align: top;">Lampiran</td><td style="vertical-align: top;">:</td><td style="vertical-align: top;"><?php echo htmlspecialchars($template['lampiran'] ?: '1 (satu) Berkas'); ?></td></tr>
+                                <tr><td style="vertical-align: top;">Perihal</td><td style="vertical-align: top;">:</td><td style="vertical-align: top;"><strong>Rekomendasi Pencairan ADD<br>Desa <?php echo htmlspecialchars($desa_nama_txt); ?></strong></td></tr>
                             </table>
+
+                            <div style="margin-top: 10px; font-size: 11pt; line-height: 1.3;">
+                                Kepada;<br>
+                                Yth. <strong>Bupati Tasikmalaya</strong><br>
+                                Melalui :<br>
+                                <strong>Kepala DPMD Kabupaten Tasikmalaya</strong><br>
+                                Di -<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<strong>SINGAPARNA</strong>
+                            </div>
                         </td>
-                        <td style="width: 44%; vertical-align: top; text-align: left; padding-left: 20px; line-height: 1.35;">
-                            Cisayong, <?php echo $tanggal_surat_tampil; ?><br><br>
-                            Kepada:<br>
-                            Yth. <strong>Kepala Dinas Pemberdayaan Masyarakat dan Desa</strong><br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kabupaten Tasikmalaya<br>
-                            di<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<strong>SINGAPARNA</strong>
+                        <td style="width: 42%; vertical-align: top; text-align: left; padding-left: 20px; line-height: 1.35;">
+                            Cisayong, &nbsp;<?php echo $tanggal_surat_tampil; ?>
                         </td>
                     </tr>
                 </table>
 
                 <!-- Salam Pembuka Tulisan Arab -->
-                <div style="text-align: center; margin: 8px 0 10px 0; font-family: 'Traditional Arabic', 'Amiri', 'Times New Roman', serif;">
+                <div style="text-align: center; margin: 10px 0 12px 0; font-family: 'Traditional Arabic', 'Amiri', 'Times New Roman', serif;">
                     <div style="font-size: 14pt; font-weight: bold; line-height: 1.2;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-                    <div style="font-size: 12pt; margin-top: 3px; font-weight: bold; line-height: 1.2;">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
+                    <div style="font-size: 12pt; margin-top: 2px; font-weight: bold; line-height: 1.2;">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
                 </div>
 
-                <div style="font-size: 11pt; text-align: justify; margin-bottom: 8px; line-height: 1.4;">
-                    <p style="text-indent: 35px; margin: 0 0 6px 0;">
-                        <?php 
-                            $desa_nama_txt = $data_form['instansi_desa'] ?? ($desa_pemohon ?: 'Desa');
-                            $no_surat_desa_txt = !empty($data_form['nomor_surat_desa']) ? ' Nomor: ' . htmlspecialchars($data_form['nomor_surat_desa']) : '';
-                        ?>
-                        Berdasarkan Surat Permohonan dari Kepala Desa <?php echo htmlspecialchars($desa_nama_txt); ?><?php echo $no_surat_desa_txt; ?> perihal Permohonan Rekomendasi Pencairan Alokasi Dana Desa (ADD) <?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?> Tahun Anggaran <?php echo date('Y'); ?>, setelah diadakan penelitian kelengkapan berkas/persyaratan administrasi ternyata telah memenuhi ketentuan yang berlaku.
+                <!-- Isi Surat Format Resmi Sesuai Contoh Nyata -->
+                <div style="font-size: 10.5pt; text-align: justify; margin-bottom: 8px; line-height: 1.35;">
+                    <p style="text-indent: 40px; margin: 0 0 6px 0;">
+                        Berdasarkan permohonan pencairan ADD Desa <?php echo htmlspecialchars($desa_nama_txt); ?> Kecamatan Cisayong Nomor : <?php echo htmlspecialchars($nomor_desa_val); ?> tanggal <?php echo $tgl_surat_desa; ?> Perihal Permohonan Pencairan Alokasi Dana Desa (ADD), berdasarkan hasil verifikasi, dengan ini kami merekomendasikan permohonan Pencairan Alokasi Dana Desa (ADD) dimaksud untuk <?php echo htmlspecialchars($peruntukan_val); ?> sebesar <strong>Rp. <?php echo $nominal_fmt; ?>,- (<?php echo htmlspecialchars($terbilang_txt); ?>)</strong>
                     </p>
-                    <p style="text-indent: 35px; margin: 0 0 6px 0;">
-                        Sehubungan hal tersebut di atas, bersama ini kami sampaikan Rekomendasi Pencairan Alokasi Dana Desa (ADD) Desa <?php echo htmlspecialchars($desa_nama_txt); ?> <?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?> dengan rincian sebagai berikut:
+                    <p style="text-indent: 40px; margin: 0 0 4px 0;">
+                        Adapun kelengkapan pengajuan pencairan sebagaimana terlampir, meliputi :
                     </p>
-                </div>
-
-                <div style="margin: 0 0 8px 25px;">
-                    <table style="width: 95%; font-size: 11pt; line-height: 1.3;" cellpadding="2" cellspacing="0">
-                        <tr>
-                            <td style="width: 32%; vertical-align: top;">Nama Kepala Desa</td>
-                            <td style="width: 3%; vertical-align: top;">:</td>
-                            <td style="vertical-align: top;"><strong><?php echo htmlspecialchars($data_form['nama_kades'] ?? '-'); ?></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="vertical-align: top;">Pemerintah Desa</td>
-                            <td style="vertical-align: top;">:</td>
-                            <td style="vertical-align: top;"><strong><?php echo htmlspecialchars($desa_nama_txt); ?></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="vertical-align: top;">Tahap Pencairan</td>
-                            <td style="vertical-align: top;">:</td>
-                            <td style="vertical-align: top;"><strong><?php echo htmlspecialchars($data_form['tahap_alokasi'] ?? 'Tahap I'); ?></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="vertical-align: top;">Jumlah Dana (ADD)</td>
-                            <td style="vertical-align: top;">:</td>
-                            <td style="vertical-align: top;"><strong>Rp <?php echo is_numeric($data_form['jumlah_dana'] ?? '') ? number_format((float)$data_form['jumlah_dana'], 0, ',', '.') : htmlspecialchars($data_form['jumlah_dana'] ?? '0'); ?></strong></td>
-                        </tr>
-                        <tr>
-                            <td style="vertical-align: top;">Peruntukan Kegiatan</td>
-                            <td style="vertical-align: top;">:</td>
-                            <td style="vertical-align: top; text-align: justify;"><em><?php echo htmlspecialchars($data_form['peruntukan_dana'] ?? '-'); ?></em></td>
-                        </tr>
+                    <table style="width: 100%; font-size: 10.5pt; line-height: 1.25; margin-left: 20px; margin-bottom: 6px;" cellpadding="0" cellspacing="0">
+                        <tr><td style="width: 28px; vertical-align: top;">1.</td><td>Surat Permohonan Pencairan;</td></tr>
+                        <tr><td style="vertical-align: top;">2.</td><td>Bukti Pembayaran;</td></tr>
+                        <tr><td style="vertical-align: top;">3.</td><td>Fakta integritas;</td></tr>
+                        <tr><td style="vertical-align: top;">4.</td><td>Surat Pernyataan Tanggungjawab Mutlak (SPTJM);</td></tr>
+                        <tr><td style="vertical-align: top;">5.</td><td>Foto Copy KTP Kepala Desa dan Bendahara Desa;</td></tr>
+                        <tr><td style="vertical-align: top;">6.</td><td>Foto Copy Rekening dan NPWP Pemerintahan Desa;</td></tr>
+                        <tr><td style="vertical-align: top;">7.</td><td>Laporan Realisasi APBDesa Bulanan;</td></tr>
+                        <tr><td style="vertical-align: top;">8.</td><td>Daftar Kehadiran (Absen) Bulan <?php echo htmlspecialchars($bulan_absen_id); ?>;</td></tr>
+                        <tr><td style="vertical-align: top;">9.</td><td>Print out Rekening koran Dana Cadangan Pilkades;</td></tr>
+                        <tr><td style="vertical-align: top;">10.</td><td>Lembar Verifikasi Kecamatan.</td></tr>
                     </table>
-                </div>
-
-                <div style="font-size: 11pt; text-align: justify; margin-bottom: 6px; line-height: 1.4;">
-                    <p style="text-indent: 35px; margin: 0;">
-                        Demikian surat rekomendasi ini kami sampaikan untuk dipergunakan sebagaimana mestinya, atas perhatian dan kerjasamanya kami ucapkan terima kasih.
+                    <p style="text-indent: 40px; margin: 0;">
+                        Demikian untuk maklum, atas terkabulnya kami ucapkan terimakasih.
                     </p>
                 </div>
 
                 <!-- Salam Penutup Tulisan Arab -->
-                <div style="text-align: left; margin: 6px 0 12px 0; font-family: 'Traditional Arabic', 'Amiri', 'Times New Roman', serif;">
-                    <div style="font-size: 12pt; font-weight: bold; line-height: 1.2;">وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
+                <div style="text-align: center; margin: 10px 0 16px 0; font-family: 'Traditional Arabic', 'Amiri', 'Times New Roman', serif;">
+                    <div style="font-size: 13pt; font-weight: bold; line-height: 1.2;">وَالسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</div>
                 </div>
 
             <?php elseif ($jenis_surat === 'Dispensasi Nikah'): ?>
@@ -676,70 +673,29 @@ function unduhPdfLangsung() {
                 </div>
             <?php endif; ?>
 
-            <!-- BLOK TANDA TANGAN (KOTAK RESMI DINAS ATAU GAMBAR SPESIMEN) -->
-            <table style="width: 100%; margin-bottom: 12px;" cellpadding="0" cellspacing="0">
+            <!-- BLOK TANDA TANGAN (KOSONGKAN RUANG UNTUK TTD & STEMPEL MANUAL BASAH SESUAI PERMINTAAN) -->
+            <table style="width: 100%; margin-top: 15px; margin-bottom: 25px;" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td style="width: 48%;"></td>
-                    <td style="width: 52%; text-align: center;" align="center">
-                        <div style="display: inline-block; text-align: center; width: 310px;">
-                            <p style="font-size: 11pt; margin: 0 0 6px 0;">Cisayong, <?php echo $tanggal_surat_tampil; ?></p>
-                            
-                            <?php if ($is_ttd_dibubuhkan === 1): ?>
-                                <?php if ($current_ttd && $current_ttd['tipe_ttd'] === 'gambar_upload' && !empty($current_ttd['gambar_ttd'])): ?>
-                                    <!-- FORMAT MURNI GAMBAR TANDA TANGAN (HANYA BENTUK GAMBAR SAJA) -->
-                                    <div style="display: flex; justify-content: center; align-items: center; min-height: 70px; padding: 2px 0;">
-                                        <img src="<?php echo BASE_URL . $current_ttd['gambar_ttd']; ?>" alt="Tanda Tangan Resmi" style="max-height: 85px; max-width: 270px; object-fit: contain; display: block; margin: 0 auto;">
-                                    </div>
-                                <?php else: ?>
-                                    <!-- KOTAK TTE RESMI BERBINGKAI & BERLOGO (BSrE BSSN) -->
-                                    <div style="border: 1.5px solid #334155; padding: 8px 12px; background: #ffffff; display: flex; align-items: center; gap: 12px; text-align: left; box-sizing: border-box;">
-                                        <img src="<?php echo BASE_URL; ?>assets/logo/Tasikmalaya_Regency_Seal.png" alt="Logo Kabupaten Tasikmalaya" style="height: 55px; width: auto; object-fit: contain; flex-shrink: 0;">
-                                        <div style="font-size: 8.5pt; color: #000; line-height: 1.3; font-family: 'Times New Roman', Times, serif;">
-                                            <span style="font-size: 7.5pt; color: #475569;"><?php echo htmlspecialchars($current_ttd['teks_atas'] ?? 'Ditandatangani secara elektronik oleh'); ?></span><br>
-                                            <strong style="text-transform: uppercase; font-size: 9pt;"><?php echo htmlspecialchars($current_ttd['jabatan'] ?? 'CAMAT CISAYONG'); ?></strong><br><br>
-                                            <strong style="text-decoration: underline; font-size: 9pt;"><?php echo htmlspecialchars($current_ttd['nama_pejabat'] ?? $camat_nama_final); ?></strong><br>
-                                            <span><?php echo htmlspecialchars($current_ttd['pangkat_golongan'] ?? ($template['penandatangan_pangkat'] ?? 'Pembina : Tk. I IV/b')); ?></span><br>
-                                            <?php if (!empty($current_ttd['nip'])): ?>
-                                                <span style="font-size: 7.5pt;">NIP. <?php echo htmlspecialchars($current_ttd['nip']); ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-                            <?php else: ?>
-                                <!-- TAMPILAN JIKA BELUM DIBUBUHI TANDA TANGAN -->
-                                <div style="border: 1.5px dashed #94a3b8; padding: 12px; background: #f8fafc; text-align: center; border-radius: 6px;">
-                                    <p style="font-size: 9pt; font-weight: bold; color: #e11d48; margin: 0 0 2px 0; font-family: sans-serif;">
-                                        [ BELUM DIBUBUHI TANDA TANGAN ]
-                                    </p>
-                                    <p style="font-size: 7.5pt; color: #64748b; margin: 0; font-family: sans-serif;">
-                                        Dokumen menunggu tombol pembubuhan tanda tangan pejabat.
-                                    </p>
-                                    <?php if (is_kecamatan_role($user_role)): ?>
-                                        <button type="button" onclick="openModalTTD()" class="no-print" style="margin-top: 6px; padding: 5px 12px; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-size: 8pt; font-weight: bold; cursor: pointer;">
-                                            🖋️ Bubuhkan Sekarang
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endif; ?>
+                    <td style="width: 50%;"></td>
+                    <td style="width: 50%; text-align: center;" align="center">
+                        <div style="display: inline-block; text-align: center; width: 280px;">
+                            <div style="font-size: 11pt; font-weight: bold; margin-bottom: 75px; text-transform: uppercase;">
+                                <?php echo htmlspecialchars($template['penandatangan_jabatan'] ?? 'CAMAT CISAYONG'); ?>
+                            </div>
+
+                            <!-- Ruang kosong 75px di atas dikosongkan untuk tanda tangan basah & stempel manual -->
+
+                            <div>
+                                <strong style="text-decoration: underline; font-size: 11pt; text-transform: uppercase;">
+                                    <?php echo htmlspecialchars($template['penandatangan_nama'] ?? $camat_nama_final); ?>
+                                </strong><br>
+                                <span style="font-size: 9.5pt;"><?php echo htmlspecialchars($template['penandatangan_pangkat'] ?? 'Pembina Tk. I, IV/b'); ?></span><br>
+                                <span style="font-size: 9.5pt;">NIP. <?php echo htmlspecialchars($template['penandatangan_nip'] ?? '19721003 199403 1 012'); ?></span>
+                            </div>
                         </div>
                     </td>
                 </tr>
             </table>
-
-            <!-- FOOTER VERIFIKASI RESMI KECAMATAN -->
-            <div style="border-top: 1px solid #94a3b8; padding-top: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 7.5pt; line-height: 1.3; color: #475569; font-family: 'Times New Roman', Times, serif;">
-                <div>
-                    Dokumen Pelayanan Resmi Kecamatan Cisayong Kabupaten Tasikmalaya.<br>
-                    <strong>Verifikasi Pelayanan:</strong> Front Office Layanan / PTSP (<?php echo htmlspecialchars($pengajuan['ptsp_oleh'] ?? 'Valid'); ?>) • Kasi Terkait (<?php echo htmlspecialchars($pengajuan['paraf_kasi_oleh'] ?? 'Disetujui'); ?>)
-                </div>
-                <div style="text-align: right; font-family: monospace; font-size: 7.5pt; flex-shrink: 0;">
-                    <?php if ($status_norm === 'disetujui'): ?>
-                        <span style="color: #047857; font-weight: bold;">[ RESMI & SAH ]</span>
-                    <?php else: ?>
-                        <span style="color: #e11d48; font-weight: bold;">[ DRAFT ]</span>
-                    <?php endif; ?>
-                </div>
-            </div>
 
         </div>
     </div>
